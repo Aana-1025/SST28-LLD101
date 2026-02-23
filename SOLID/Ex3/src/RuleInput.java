@@ -1,6 +1,24 @@
-// Smell: unused config-like class.
 public class RuleInput {
-    public double minCgr = 8.0;
-    public int minAttendance = 75;
-    public int minCredits = 20;
+
+    private final double minCgr;
+    private final int minAttendance;
+    private final int minCredits;
+
+    public RuleInput(double minCgr, int minAttendance, int minCredits) {
+        this.minCgr = minCgr;
+        this.minAttendance = minAttendance;
+        this.minCredits = minCredits;
+    }
+
+    public double getMinCgr() {
+        return minCgr;
+    }
+
+    public int getMinAttendance() {
+        return minAttendance;
+    }
+
+    public int getMinCredits() {
+        return minCredits;
+    }
 }

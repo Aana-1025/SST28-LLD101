@@ -1,42 +1,32 @@
 import java.util.*;
 
 public class CafeteriaSystem {
-    private final Map<String, MenuItem> menu = new LinkedHashMap<>();
-    private final FileStore store = new FileStore();
-    private int invoiceSeq = 1000;
 
-    public void addToMenu(MenuItem i) { menu.put(i.id, i); }
+    private final Map<String, MenuItem> menu = new HashMap<>();
+    private final TaxRules taxRules;
 
-    // Intentionally SRP-violating: menu mgmt + tax + discount + format + persistence.
-    public void checkout(String customerType, List<OrderLine> lines) {
-        String invId = "INV-" + (++invoiceSeq);
-        StringBuilder out = new StringBuilder();
-        out.append("Invoice# ").append(invId).append("\n");
+    public CafeteriaSystem(TaxRules taxRules) {
+        this.taxRules = taxRules;
+    }
+
+    public void addToMenu(MenuItem item) {
+        menu.put(item.id, item);
+    }
+
+    public void checkout(List<OrderLine> order) {
 
         double subtotal = 0.0;
-        for (OrderLine l : lines) {
-            MenuItem item = menu.get(l.itemId);
-            double lineTotal = item.price * l.qty;
-            subtotal += lineTotal;
-            out.append(String.format("- %s x%d = %.2f\n", item.name, l.qty, lineTotal));
+
+        for (OrderLine line : order) {
+            MenuItem item = menu.get(line.itemId);
+            subtotal += item.price * line.qty;
         }
 
-        double taxPct = TaxRules.taxPercent(customerType);
-        double tax = subtotal * (taxPct / 100.0);
+        double tax = subtotal * taxRules.taxPercent() / 100.0;
+        double total = subtotal + tax;
 
-        double discount = DiscountRules.discountAmount(customerType, subtotal, lines.size());
-
-        double total = subtotal + tax - discount;
-
-        out.append(String.format("Subtotal: %.2f\n", subtotal));
-        out.append(String.format("Tax(%.0f%%): %.2f\n", taxPct, tax));
-        out.append(String.format("Discount: -%.2f\n", discount));
-        out.append(String.format("TOTAL: %.2f\n", total));
-
-        String printable = InvoiceFormatter.identityFormat(out.toString());
-        System.out.print(printable);
-
-        store.save(invId, printable);
-        System.out.println("Saved invoice: " + invId + " (lines=" + store.countLines(invId) + ")");
+        System.out.println("Subtotal: " + subtotal);
+        System.out.println("Tax: " + tax);
+        System.out.println("Total: " + total);
     }
 }
