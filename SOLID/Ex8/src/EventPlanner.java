@@ -1,10 +1,17 @@
 import java.util.*;
 
-public class EventPlanner {
+public class EventPlanner implements EventManager {
+
     private final List<String> events = new ArrayList<>();
-    public void create(String name, double budget) {
+
+    @Override
+    public void createEvent(String name, double budget) {
         events.add(name);
-        System.out.println("Event created: " + name + " (budget=" + (int)budget + ")");
+        System.out.println("Event created: " + name + " (budget " + budget + ")");
     }
-    public int count() { return events.size(); }
+
+    @Override
+    public int getEventsCount() {
+        return events.size();
+    }
 }

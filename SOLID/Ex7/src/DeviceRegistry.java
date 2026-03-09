@@ -1,14 +1,19 @@
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class DeviceRegistry {
-    private final java.util.List<SmartClassroomDevice> devices = new ArrayList<>();
 
-    public void add(SmartClassroomDevice d) { devices.add(d); }
+    private final List<Object> devices = new ArrayList<>();
 
-    public SmartClassroomDevice getFirstOfType(String simpleName) {
-        for (SmartClassroomDevice d : devices) {
-            if (d.getClass().getSimpleName().equals(simpleName)) return d;
-        }
-        throw new IllegalStateException("Missing: " + simpleName);
+    public void add(Object device) {
+        devices.add(device);
+    }
+
+    public <T> List<T> getByCapability(Class<T> type) {
+        return devices.stream()
+                .filter(type::isInstance)
+                .map(type::cast)
+                .collect(Collectors.toList());
     }
 }
